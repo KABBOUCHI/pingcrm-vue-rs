@@ -1,0 +1,13 @@
+[package]
+name = "seed"
+version.workspace = true
+edition.workspace = true
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { workspace = true }
+ensemble = { workspace = true }
+dotenv = { workspace = true }
+models = { path = "../models" }
+faker_rand = "0.1.1"
+rand = "0.8.5"
