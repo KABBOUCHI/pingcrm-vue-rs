@@ -1,10 +1,5 @@
 [workspace]
-members = [
-    "app",
-    "models",
-    "migrations",
-    "seed",
-]
+members = ["app", "models", "migrations", "seed"]
 resolver = "2"
 
 [workspace.package]
@@ -12,7 +7,7 @@ version = "0.0.1"
 edition = "2021"
 
 [workspace.dependencies]
-ensemble = "0.0.1"
+ensemble = { version = "0.0.1", git = "https://github.com/m1guelpf/ensemble" }
 tokio = { version = "1.32.0", features = ["full"] }
 dotenv = "0.15.0"
 anyhow = "1.0.75"

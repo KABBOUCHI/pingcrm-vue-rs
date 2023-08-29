@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::{response::IntoResponse, routing::get, Router, Json};
+use axum::{response::IntoResponse, routing::get, Json, Router, extract::Path};
 use dotenv::dotenv;
 use models::*;
 use std::{env, net::SocketAddr};
@@ -24,7 +24,9 @@ async fn main() -> Result<()> {
 
     let app = Router::new()
         .route("/", get(hello_world))
-        .route("/users", get(list_users));
+        .route("/users", get(list_users))
+        .route("/users/:user_id/posts", get(list_user_posts))
+        .route("/posts", get(list_posts));
 
     let address = SocketAddr::from((
         [0, 0, 0, 0],
@@ -47,4 +49,17 @@ async fn list_users() -> Json<Vec<User>> {
     let users = User::all().await.unwrap();
 
     Json(users)
+}
+
+
+async fn list_user_posts(Path(user_id): Path<u64>) -> Json<Vec<Post>> {
+    let posts = Post::query().r#where("user_id", "=", user_id).get().await.unwrap();
+
+    Json(posts)
+}
+
+async fn list_posts() -> Json<Vec<Post>> {
+    let posts = Post::all().await.unwrap();
+
+    Json(posts)
 }
