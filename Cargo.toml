@@ -1,5 +1,5 @@
 [workspace]
-members = ["app", "models", "migrations", "seed"]
+members = ["app", "models", "db"]
 resolver = "2"
 
 [workspace.package]

@@ -4,7 +4,7 @@
 ```bash
 cp .env.example .env
 
-cargo run --bin migrate
-cargo run --bin seed
+cargo run --bin db migrate up
+cargo run --bin db seed
 cargo run --bin app
 ```
