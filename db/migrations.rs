@@ -40,8 +40,9 @@ pub async fn wipe() -> anyhow::Result<()> {
 
         if let Some(name) = table.get("name") {
             println!("Dropping table {}", name);
-            
-            conn.exec("DROP TABLE IF EXISTS ?", vec![rbs::to_value!(name)]).await?;
+
+            conn.exec(&format!("DROP TABLE IF EXISTS {}", name), vec![])
+                .await?;
         }
     }
 
