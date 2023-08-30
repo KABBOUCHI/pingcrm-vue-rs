@@ -12,6 +12,7 @@ pub struct User {
     pub password: Hashed<String>,
     pub created_at: DateTime,
     pub updated_at: DateTime,
+
     // #[model(foreign_key = "user_id")]
     // pub posts: HasMany<User, Post>,
 }

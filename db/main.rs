@@ -30,7 +30,11 @@ enum MigrateCommands {
     /// Run the next database migration
     Up,
     /// Rollback the last database migration
-    Down,
+    Down {
+        /// Number of batches to rollback
+        #[clap(default_value = "1")]
+        batches: u64,
+    },
     /// Show the status of each migration
     Status,
 }
@@ -50,8 +54,8 @@ async fn main() -> anyhow::Result<()> {
             MigrateCommands::Up => {
                 migrations::migrate().await?;
             }
-            MigrateCommands::Down => {
-                migrations::rollback().await?;
+            MigrateCommands::Down { batches } => {
+                migrations::rollback(*batches).await?;
             }
             MigrateCommands::Status => {
                 migrations::status().await?;
