@@ -35,6 +35,8 @@ enum MigrateCommands {
         #[clap(default_value = "1")]
         batches: u64,
     },
+    /// Drop all tables and re-run all migrations
+    Fresh,
     /// Show the status of each migration
     Status,
 }
@@ -51,6 +53,9 @@ async fn main() -> anyhow::Result<()> {
 
     match &cli.command {
         Commands::Migrate { command } => match command {
+            MigrateCommands::Fresh => {
+                migrations::fresh().await?;
+            }
             MigrateCommands::Up => {
                 migrations::migrate().await?;
             }

@@ -17,3 +17,4 @@ models = { path = "../models" }
 clap = { version = "4.4.1", features = ["derive"] }
 rand = "0.8.5"
 faker_rand = "0.1.1"
+rbs = "4.3.3"

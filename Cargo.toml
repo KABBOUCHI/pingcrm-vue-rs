@@ -7,7 +7,7 @@ version = "0.0.1"
 edition = "2021"
 
 [workspace.dependencies]
-ensemble = { git = "https://github.com/m1guelpf/ensemble", features = ["mysql"]}
+ensemble = { git = "https://github.com/KABBOUCHI/ensemble", branch = "expose_connection", features = ["mysql"]}
 tokio = { version = "1.32.0", features = ["full"] }
 dotenv = "0.15.0"
 anyhow = "1.0.75"
