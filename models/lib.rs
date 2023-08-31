@@ -13,8 +13,8 @@ pub struct User {
     pub created_at: DateTime,
     pub updated_at: DateTime,
 
-    // #[model(foreign_key = "user_id")]
-    // pub posts: HasMany<User, Post>,
+    #[model(foreign_key = "user_id")]
+    pub posts: HasMany<User, Post>,
 }
 
 #[derive(Debug, Model)]
@@ -25,8 +25,7 @@ pub struct Post {
     pub content: String,
     pub created_at: DateTime,
     pub updated_at: DateTime,
-    pub user_id: u64,
 
-    // #[model(column = "user_id")]
-    // pub user: BelongsTo<Post, User>,
+    #[model(foreign_key = "user_id")]
+    pub user: BelongsTo<Post, User>,
 }

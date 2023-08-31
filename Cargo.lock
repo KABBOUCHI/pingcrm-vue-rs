@@ -625,11 +625,12 @@ checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
 [[package]]
 name = "ensemble"
 version = "0.0.2"
-source = "git+https://github.com/KABBOUCHI/ensemble?branch=expose_connection#91e8a74f44f9dbd04db5d48fbc7092b396751067"
+source = "git+https://github.com/KABBOUCHI/ensemble?branch=expose_connection#ede4f3c08595d0d3e7a77608e2b7d9940462183f"
 dependencies = [
  "Inflector",
  "async-trait",
  "ensemble_derive",
+ "fastdate",
  "itertools",
  "rbatis",
  "rbdc-mysql",
@@ -646,7 +647,7 @@ dependencies = [
 [[package]]
 name = "ensemble_derive"
 version = "0.0.2"
-source = "git+https://github.com/KABBOUCHI/ensemble?branch=expose_connection#91e8a74f44f9dbd04db5d48fbc7092b396751067"
+source = "git+https://github.com/KABBOUCHI/ensemble?branch=expose_connection#ede4f3c08595d0d3e7a77608e2b7d9940462183f"
 dependencies = [
  "Inflector",
  "deluxe",
