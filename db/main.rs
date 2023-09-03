@@ -2,8 +2,9 @@ use clap::{Parser, Subcommand};
 use dotenv::dotenv;
 use std::env;
 
-// TODO: automatically generate this mod
-mod migrations;
+mod migrations {
+    macros::migrations!();
+}
 mod seeders;
 
 #[derive(Parser)]
@@ -39,6 +40,8 @@ enum MigrateCommands {
     Fresh,
     /// Show the status of each migration
     Status,
+    /// Create a new migration file
+    Make { name: String },
 }
 
 #[tokio::main]
@@ -64,6 +67,9 @@ async fn main() -> anyhow::Result<()> {
             }
             MigrateCommands::Status => {
                 migrations::status().await?;
+            }
+            MigrateCommands::Make { .. } => {
+                todo!()
             }
         },
         Commands::Seed {} => {
