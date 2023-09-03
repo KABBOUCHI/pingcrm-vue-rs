@@ -1,5 +1,10 @@
 use anyhow::Result;
-use axum::{extract::{Path, Query}, response::IntoResponse, routing::get, Json, Router};
+use axum::{
+    extract::{Path, Query},
+    response::IntoResponse,
+    routing::get,
+    Json, Router,
+};
 use dotenv::dotenv;
 use models::*;
 use std::{env, net::SocketAddr};
@@ -52,14 +57,11 @@ struct ListUsersQueryParams {
 }
 
 async fn list_users(params: Query<ListUsersQueryParams>) -> Json<Vec<User>> {
-    let mut users = User::query();
-
-    //TODO: add User::query().when(params.include_posts, |q| q.with("posts"));?
-    if params.include_posts {
-        users = users.with("posts");
-    }
-
-    let users = users.get().await.unwrap(); //TODO: paginate?
+    let users = User::query()
+        .when(params.include_posts, |q| q.with("posts"))
+        .get()
+        .await
+        .unwrap();
 
     Json(users)
 }
