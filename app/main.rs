@@ -1,5 +1,5 @@
 use anyhow::Result;
-use axum::{response::IntoResponse, routing::get, Json, Router, extract::Path};
+use axum::{extract::{Path, Query}, response::IntoResponse, routing::get, Json, Router};
 use dotenv::dotenv;
 use models::*;
 use std::{env, net::SocketAddr};
@@ -45,15 +45,31 @@ async fn hello_world() -> impl IntoResponse {
     "Hello, World!"
 }
 
-async fn list_users() -> Json<Vec<User>> {
-    let users = User::all().await.unwrap();
+#[derive(serde::Deserialize)]
+struct ListUsersQueryParams {
+    #[serde(default)]
+    include_posts: bool,
+}
+
+async fn list_users(params: Query<ListUsersQueryParams>) -> Json<Vec<User>> {
+    let mut users = User::query();
+
+    //TODO: add User::query().when(params.include_posts, |q| q.with("posts"));?
+    if params.include_posts {
+        users = users.with("posts");
+    }
+
+    let users = users.get().await.unwrap(); //TODO: paginate?
 
     Json(users)
 }
 
-
 async fn list_user_posts(Path(user_id): Path<u64>) -> Json<Vec<Post>> {
-    let posts = Post::query().r#where("user_id", "=", user_id).get().await.unwrap();
+    let posts = Post::query()
+        .r#where("user_id", "=", user_id)
+        .get()
+        .await
+        .unwrap();
 
     Json(posts)
 }

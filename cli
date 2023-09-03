@@ -1,0 +1,15 @@
+#!/bin/bash
+
+crate="$1"
+if [ -z $crate ]; then
+  crate="app"
+fi
+
+shift
+args="$@"
+
+if [ $crate = 'serve' ]; then
+  crate="app"
+fi
+
+cargo run -q --bin $crate -- $args

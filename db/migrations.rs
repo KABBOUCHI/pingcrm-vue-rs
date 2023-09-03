@@ -6,7 +6,7 @@ mod m_2023_09_30_000001_create_posts_table;
 use std::collections::HashMap;
 
 use anyhow::Ok;
-use ensemble::migrations::Migrator;
+use ensemble::{migrations::Migrator, query::Builder};
 
 async fn migrator() -> anyhow::Result<Migrator> {
     let mut migrator = Migrator::new().await?;
@@ -25,11 +25,7 @@ async fn migrator() -> anyhow::Result<Migrator> {
 }
 
 pub async fn wipe() -> anyhow::Result<()> {
-    let mut conn = ensemble::get_connection().await?;
-
-    // SET FOREIGN_KEY_CHECKS = 0
-
-    let tables =  conn.get_values("SELECT TABLE_NAME as name FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()", vec![]).await?;
+    let tables =  unsafe { Builder::raw_sql("SELECT TABLE_NAME as name FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()", vec![]) }.await?;
 
     let tables = tables
         .into_iter()
@@ -41,8 +37,10 @@ pub async fn wipe() -> anyhow::Result<()> {
         if let Some(name) = table.get("name") {
             println!("Dropping table {}", name);
 
-            conn.exec(&format!("DROP TABLE IF EXISTS {}", name), vec![])
-                .await?;
+            unsafe {
+                // Builder::raw_sql("DROP TABLE IF EXISTS ?", vec![ensemble::value::for_db(name)?]).await?;
+                Builder::raw_sql(&format!("DROP TABLE IF EXISTS {}", name), vec![]).await?;
+            }
         }
     }
 
@@ -71,12 +69,30 @@ pub async fn rollback(batches: u64) -> anyhow::Result<()> {
 }
 
 pub async fn status() -> anyhow::Result<()> {
-    let store = migrator().await?.status();
+    let m  = migrator().await?;
+    let pending_migrations = m.pending();
+    let store = m.status();
 
-    println!("Database migrations status:");
+    println!(
+        "{:<70} {:<30}",
+        "Migration name",
+        "Batch / Status",
+    );
 
     for migration in store {
-        dbg!(&migration);
+        println!(
+            "{:<70} {:<30}",
+            migration.migration,
+            format!("[{}] Ran", migration.batch),
+        );
+    }
+
+    for migration in pending_migrations {
+        println!(
+            "{:<70} {:<30}",
+            migration.0,
+            "Pending".to_string(),
+        );
     }
 
     Ok(())
