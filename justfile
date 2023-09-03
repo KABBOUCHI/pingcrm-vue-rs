@@ -7,6 +7,9 @@ clean:
 serve:
   cargo run -q --bin app
 
+serve-watch:
+  cargo watch -x "run -q --bin app" -c
+
 migrate *args:
   cargo run -q --bin db -- migrate {{args}}
 
