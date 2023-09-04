@@ -1,4 +1,4 @@
-# pingcrm-vue-rs
+# webapp-boilerplate-rs
 
 
 ```bash
