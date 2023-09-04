@@ -36,7 +36,7 @@ async fn get_queue() -> anyhow::Result<&'static mut AsyncQueue<NoTls>> {
         None => {
             let max_pool_size: u32 = 2;
 
-            let db_uri = &env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+            let db_uri = &env::var("DATABASE_URL").map_err(|_| anyhow::anyhow!("Failed to get DATABASE_URL"))?;
 
             let mut queue = AsyncQueue::builder()
                 // Postgres database url
