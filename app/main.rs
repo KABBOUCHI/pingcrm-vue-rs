@@ -7,6 +7,7 @@ use axum::{
 };
 use dotenv::dotenv;
 use models::*;
+use queue::Queue;
 use std::{env, net::SocketAddr};
 use tracing::info;
 
@@ -23,7 +24,8 @@ async fn main() -> Result<()> {
         .route("/", get(hello_world))
         .route("/users", get(list_users))
         .route("/users/:user_id/posts", get(list_user_posts))
-        .route("/posts", get(list_posts));
+        .route("/posts", get(list_posts))
+        .route("/job", get(job));
 
     let address = SocketAddr::from((
         [0, 0, 0, 0],
@@ -72,4 +74,11 @@ async fn list_posts() -> Json<Vec<Post>> {
     let posts = Post::all().await.unwrap();
 
     Json(posts)
+}
+async fn job() -> String {
+    Queue::dispatch(&queue::tasks::MyTask::new(1))
+        .await
+        .unwrap();
+
+    "Queued".to_string()
 }

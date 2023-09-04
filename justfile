@@ -18,3 +18,6 @@ seed *args:
 
 db *args:
   cargo run -q --bin db -- {{args}}
+
+work *args:
+  cargo run -q --bin work -- {{args}}
