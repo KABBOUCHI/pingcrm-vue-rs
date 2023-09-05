@@ -4,7 +4,7 @@ pub use ensemble::{
     Model,
 };
 
-#[derive(Debug, Model)]
+#[derive(Debug, Model, Clone)]
 pub struct User {
     pub id: u64,
     pub name: String,
@@ -17,7 +17,7 @@ pub struct User {
     pub posts: HasMany<User, Post>,
 }
 
-#[derive(Debug, Model)]
+#[derive(Debug, Model, Clone)]
 pub struct Post {
     #[model(incrementing)]
     pub id: u64,

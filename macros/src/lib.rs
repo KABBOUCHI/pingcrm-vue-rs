@@ -77,31 +77,32 @@ pub fn migrations(_tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
         }
 
         pub async fn wipe() -> anyhow::Result<()> {
-            let tables =  unsafe { Builder::raw_sql("SELECT TABLE_NAME as name FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()", vec![]) }.await?;
+            // let tables =  unsafe { Builder::raw_sql("SELECT TABLE_NAME as name FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()", vec![]) }.await?;
         
-            let tables = tables
-                .into_iter()
-                .map(rbs::from_value::<HashMap<String, String>>);
+            // let tables = tables
+            //     .into_iter()
+            //     .map(rbs::from_value::<HashMap<String, String>>);
         
-            for table in tables {
-                let table = table?;
+            // for table in tables {
+            //     let table = table?;
         
-                if let Some(name) = table.get("name") {
-                    println!("Dropping table {}", name);
+            //     if let Some(name) = table.get("name") {
+            //         println!("Dropping table {}", name);
         
-                    unsafe {
-                        // Builder::raw_sql("DROP TABLE IF EXISTS ?", vec![ensemble::value::for_db(name)?]).await?;
-                        Builder::raw_sql(&format!("DROP TABLE IF EXISTS {}", name), vec![]).await?;
-                    }
-                }
-            }
+            //         unsafe {
+            //             // Builder::raw_sql("DROP TABLE IF EXISTS ?", vec![ensemble::value::for_db(name)?]).await?;
+            //             Builder::raw_sql(&format!("DROP TABLE IF EXISTS {}", name), vec![]).await?;
+            //         }
+            //     }
+            // }
         
             Ok(())
         }
         
         pub async fn fresh() -> anyhow::Result<()> {
-            wipe().await?;
-            migrate().await
+            // wipe().await?;
+            // migrate().await
+            todo!()
         }
         
         pub async fn migrate() -> anyhow::Result<()> {

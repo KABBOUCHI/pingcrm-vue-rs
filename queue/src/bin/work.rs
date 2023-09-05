@@ -23,8 +23,6 @@ async fn main() -> Result<()> {
     pool.start().await;
 
     loop {
-        println!("Workers working ...");
-
-        sleep(Duration::from_secs(1)).await;
+        sleep(Duration::from_millis(300)).await;
     }
 }

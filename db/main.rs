@@ -3,7 +3,52 @@ use dotenv::dotenv;
 use std::env;
 
 mod migrations {
+    use std::io::Write;
+    use convert_case::{Case, Casing};
+
     macros::migrations!();
+
+    pub async fn make(name: &String) -> anyhow::Result<()> {
+        let snake_case = name.to_case(Case::Snake);
+        let table_name = snake_case.replace("create_", "").replace("_table", "");
+        let pascale_case = name.to_case(Case::Pascal);
+
+        let mut file = std::fs::File::create(format!(
+            "./db/migrations/m_{}_{}.rs",
+            chrono::Utc::now().format("%Y_%m_%d_%H%M%S"),
+            snake_case
+        ))
+        .expect("Error encountered while creating file!");
+
+
+        let text = format!(r#"
+use ensemble::migrations::{{Error, Migration, Schema}};
+
+#[derive(Debug, Default)]
+pub struct {pascale_case};
+
+#[ensemble::async_trait]
+impl Migration for {pascale_case} {{
+    async fn up(&self) -> Result<(), Error> {{
+        Schema::create("{table_name}", |table| {{
+            table.id();
+            table.timestamps();
+        }})
+        .await
+    }}
+
+    async fn down(&self) -> Result<(), Error> {{
+        Schema::drop("{table_name}").await
+    }}
+}}"#);     
+
+
+        file.write_all(text.as_bytes())?;
+
+        std::process::Command::new("cargo").args(["clean", "-p", "macros"]).output()?;
+
+        Ok(())
+    }
 }
 mod seeders;
 
@@ -68,8 +113,8 @@ async fn main() -> anyhow::Result<()> {
             MigrateCommands::Status => {
                 migrations::status().await?;
             }
-            MigrateCommands::Make { .. } => {
-                todo!()
+            MigrateCommands::Make { name } => {
+                migrations::make(name).await?;
             }
         },
         Commands::Seed {} => {

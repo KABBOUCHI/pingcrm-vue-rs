@@ -4,6 +4,9 @@ build:
 clean:
   cargo clean
 
+clean-macros:
+  cargo clean -p macros
+
 serve:
   cargo run -q --bin app
 
