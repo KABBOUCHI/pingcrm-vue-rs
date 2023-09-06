@@ -23,6 +23,6 @@ async fn main() -> Result<()> {
     pool.start().await;
 
     loop {
-        sleep(Duration::from_millis(300)).await;
+        sleep(Duration::from_millis(100)).await;
     }
 }
