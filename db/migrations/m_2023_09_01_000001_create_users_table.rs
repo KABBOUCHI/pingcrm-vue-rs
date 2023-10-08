@@ -7,7 +7,7 @@ pub struct CreateUsersTable;
 impl Migration for CreateUsersTable {
     async fn up(&self) -> Result<(), Error> {
         Schema::create("users", |table| {
-            table.id();
+            table.uuid();
             table.string("name");
             table.string("email").unique(true);
             table.string("password");

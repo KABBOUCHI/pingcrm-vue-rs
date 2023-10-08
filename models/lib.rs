@@ -3,10 +3,12 @@ pub use ensemble::{
     types::{DateTime, Hashed},
     Model,
 };
+use ensemble::types::Uuid;
 
 #[derive(Debug, Model, Clone)]
 pub struct User {
-    pub id: u64,
+    #[model(uuid)]
+    pub id: Uuid,
     pub name: String,
     pub email: String,
     pub password: Hashed<String>,
@@ -19,8 +21,8 @@ pub struct User {
 
 #[derive(Debug, Model, Clone)]
 pub struct Post {
-    #[model(incrementing)]
-    pub id: u64,
+    #[model(uuid)]
+    pub id: Uuid,
     pub title: String,
     pub content: String,
     pub created_at: DateTime,

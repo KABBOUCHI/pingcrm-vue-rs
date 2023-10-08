@@ -7,12 +7,12 @@ pub struct CreatePostsTable;
 impl Migration for CreatePostsTable {
     async fn up(&self) -> Result<(), Error> {
         Schema::create("posts", |table| {
-            table.id();
+            table.uuid();
             table.string("title");
             table.text("content");
             table.timestamps();
 
-            table.foreign_id("user_id").on_delete("cascade");
+            table.foreign_uuid("user_id").on_delete("cascade");
         })
         .await
     }
