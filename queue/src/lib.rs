@@ -1,69 +1,43 @@
 use std::env;
-use std::sync::{Mutex, OnceLock};
-
+use std::sync::OnceLock;
 use dotenv::dotenv;
-use fang::asynk::async_queue::AsyncQueue;
-use fang::NoTls;
+use job_queue::{Client, Job};
 
-pub use fang::asynk::async_queue::AsyncQueueable;
-pub use fang::AsyncRunnable;
+pub mod jobs;
 
-pub mod tasks;
-
-static QUEUE: OnceLock<Mutex<AsyncQueue<NoTls>>> = OnceLock::new();
+static QUEUE: OnceLock<Client> = OnceLock::new();
 
 pub struct Queue;
 
 impl Queue {
-    pub async fn dispatch(task: &impl AsyncRunnable) -> anyhow::Result<()> {
-        let mut queue = get_queue().await?;
+    pub async fn dispatch(task: &impl Job) -> anyhow::Result<()> {
+        let queue = get_queue().await?;
 
-        queue.insert_task(task).await?;
+        queue.dispatch(task).await?;
 
         Ok(())
     }
-
-    pub async fn queue() -> anyhow::Result<AsyncQueue<NoTls>> {
-        get_queue().await
-    }
 }
 
-async fn get_queue() -> anyhow::Result<AsyncQueue<NoTls>> {
-    dotenv().ok();
-
+async fn get_queue() -> anyhow::Result<Client> {
+    
     match QUEUE.get() {
-        Some(queue) => {
-            let queue = queue.lock().map_err(|_| anyhow::anyhow!("Failed to get queue"))?;
-
-            let queue = queue.clone();
-
-            Ok(queue)
-        }
+        Some(client) => Ok(client.clone()),
         None => {
-            let max_pool_size: u32 = 2;
+            dotenv().ok();
 
-            let db_uri = &env::var("DATABASE_URL")
+            let database_url = env::var("DATABASE_URL")
                 .map_err(|_| anyhow::anyhow!("Failed to get DATABASE_URL"))?;
 
-            let mut queue = AsyncQueue::builder()
-                // Postgres database url
-                .uri(db_uri)
-                // Max number of connections that are allowed
-                .max_pool_size(max_pool_size)
-                .build();
+            let queue = Client::builder()
+                .connect(&database_url)
+                .await
+                .map_err(|_| anyhow::anyhow!("Failed to connect to database"))?;
 
-            queue.connect(NoTls).await?;
-
-            let _ = QUEUE.set(Mutex::new(queue));
+            let _ = QUEUE.set(queue);
 
             match QUEUE.get() {
-                Some(queue) => {
-                    let queue = queue.lock().map_err(|_| anyhow::anyhow!("Failed to get queue"))?;
-
-                    let queue = queue.clone();
-
-                    Ok(queue)
-                }
+                Some(client) => Ok(client.clone()),
                 None => Err(anyhow::anyhow!("Failed to get queue")),
             }
         }

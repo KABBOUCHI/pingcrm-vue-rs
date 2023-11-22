@@ -76,9 +76,7 @@ async fn list_posts() -> Json<Vec<Post>> {
     Json(posts)
 }
 async fn job() -> String {
-    Queue::dispatch(&queue::tasks::MyTask::new(1))
-        .await
-        .unwrap();
+    Queue::dispatch(&queue::jobs::MyJob::new(1)).await.unwrap();
 
     "Queued".to_string()
 }
