@@ -1,7 +1,7 @@
-use std::env;
-use std::sync::OnceLock;
 use dotenv::dotenv;
 use job_queue::{Client, Job};
+use std::env;
+use std::sync::OnceLock;
 
 pub mod jobs;
 
@@ -20,7 +20,6 @@ impl Queue {
 }
 
 async fn get_queue() -> anyhow::Result<Client> {
-    
     match QUEUE.get() {
         Some(client) => Ok(client.clone()),
         None => {

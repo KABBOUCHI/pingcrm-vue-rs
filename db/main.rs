@@ -3,8 +3,8 @@ use dotenv::dotenv;
 use std::env;
 
 mod migrations {
-    use std::io::Write;
     use convert_case::{Case, Casing};
+    use std::io::Write;
 
     macros::migrations!();
 
@@ -20,8 +20,8 @@ mod migrations {
         ))
         .expect("Error encountered while creating file!");
 
-
-        let text = format!(r#"
+        let text = format!(
+            r#"
 use ensemble::migrations::{{Error, Migration, Schema}};
 
 #[derive(Debug, Default)]
@@ -40,12 +40,14 @@ impl Migration for {pascale_case} {{
     async fn down(&self) -> Result<(), Error> {{
         Schema::drop("{table_name}").await
     }}
-}}"#);     
-
+}}"#
+        );
 
         file.write_all(text.as_bytes())?;
 
-        std::process::Command::new("cargo").args(["clean", "-p", "macros"]).output()?;
+        std::process::Command::new("cargo")
+            .args(["clean", "-p", "macros"])
+            .output()?;
 
         Ok(())
     }
@@ -94,7 +96,6 @@ async fn main() -> anyhow::Result<()> {
     dotenv().ok();
 
     ensemble::setup(&env::var("DATABASE_URL").expect("DATABASE_URL must be set"))
-        .await
         .expect("Failed to set up database pool.");
 
     let cli = Cli::parse();

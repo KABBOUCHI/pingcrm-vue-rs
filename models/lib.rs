@@ -1,9 +1,9 @@
+use ensemble::types::Uuid;
 pub use ensemble::{
     relationships::{BelongsTo, HasMany, Relationship},
     types::{DateTime, Hashed},
     Model,
 };
-use ensemble::types::Uuid;
 
 #[derive(Debug, Model, Clone)]
 pub struct User {

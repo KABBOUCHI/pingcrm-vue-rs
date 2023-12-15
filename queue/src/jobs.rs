@@ -1,5 +1,5 @@
 use ensemble::Model;
-use job_queue::{serde, typetag, Error, Job, async_trait};
+use job_queue::{async_trait, serde, typetag, Error, Job};
 use models::User;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]

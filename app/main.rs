@@ -1,23 +1,26 @@
 use anyhow::Result;
 use axum::{
     extract::{Path, Query},
+    http::Request,
     response::IntoResponse,
     routing::get,
     Json, Router,
 };
+use axum_trace_id::{SetTraceIdLayer, TraceId};
+use tower_http::trace::TraceLayer;
+
 use dotenv::dotenv;
 use models::*;
 use queue::Queue;
 use std::{env, net::SocketAddr};
-use tracing::info;
+use tracing::{info, info_span};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt().json().init();
 
     ensemble::setup(&env::var("DATABASE_URL").expect("DATABASE_URL must be set"))
-        .await
         .expect("Failed to set up database pool.");
 
     let app = Router::new()
@@ -25,7 +28,17 @@ async fn main() -> Result<()> {
         .route("/users", get(list_users))
         .route("/users/:user_id/posts", get(list_user_posts))
         .route("/posts", get(list_posts))
-        .route("/job", get(job));
+        .route("/job", get(job))
+        .layer(
+            TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
+                if let Some(trace) = request.extensions().get::<TraceId<String>>() {
+                    info_span!("http_request", trace_id = trace.id)
+                } else {
+                    info_span!("http_request", trace_id = "none")
+                }
+            }),
+        )
+        .layer(SetTraceIdLayer::<String>::new().with_header_name("X-Request-Id"));
 
     let address = SocketAddr::from((
         [0, 0, 0, 0],
